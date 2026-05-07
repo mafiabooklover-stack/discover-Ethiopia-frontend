@@ -236,7 +236,7 @@
             };
 
             try {
-                const res = await fetch(`${API}/destinations`, {
+                const res = await fetch(`${API}/api/destinations`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -269,7 +269,7 @@
             if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
 
             try {
-                const res = await fetch(`${API}/destinations/${id}`, {
+                const res = await fetch(`${API}/api/destinations/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${getToken()}` }
                 });
