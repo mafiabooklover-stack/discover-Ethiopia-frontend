@@ -134,7 +134,7 @@
 
         async function loadPlace() {
             const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
+            const name = params.get('name');
 
             if (!id) {
                 showError();
@@ -142,7 +142,7 @@
             }
 
             try {
-                const res = await fetch(`${API}/destinations/${id}`);
+                const res = await fetch(`${API}/destinations/${name}`);
                 if (!res.ok) throw new Error('Not found');
                 const dest = await res.json();
                 renderPlace(dest);
