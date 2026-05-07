@@ -34,7 +34,7 @@ async function loadFeaturedDestinations() {
     container.innerHTML = '<div class="loading">Loading destinations...</div>';
 
     try {
-        const res = await fetch(`${API}/destinations/featured`);
+        const res = await fetch(`${API}/api/destinations/featured`);
         if (!res.ok) throw new Error('API error');
         const destinations = await res.json();
 
