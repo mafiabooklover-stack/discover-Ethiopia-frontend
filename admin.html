@@ -149,7 +149,7 @@
 
     <script src="js/auth.js"></script>
     <script>
-        const API = 'http://localhost:5001/api';
+        const API = 'https://discover-ethiopia-backend.onrender.com';
         let allDestinations = [];
 
         // Check auth on load
@@ -165,7 +165,7 @@
         // ── Load & render destination list ──
         async function loadDestinations() {
             try {
-                const res = await fetch(`${API}/destinations`);
+                const res = await fetch(`${API}/api/destinations`);
                 allDestinations = await res.json();
                 renderList(allDestinations);
                 document.getElementById('destCount').textContent = `${allDestinations.length} places`;
