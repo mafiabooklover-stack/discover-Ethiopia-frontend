@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Ethiopia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">Discover <span>Ethiopia</span></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="destinations.html">Destinations</a>
+            <a href="contact.html">Contact</a>
+            <div id="authNav"></div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-slides" id="heroSlides"></div>
+        <div class="hero-dots" id="heroDots"></div>
+        <button class="hero-arrow hero-arrow-prev" id="heroPrev" aria-label="Previous slide">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="hero-arrow hero-arrow-next" id="heroNext" aria-label="Next slide">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-globe-africa"></i> East Africa's Hidden Gem</div>
+            <h1>Explore the Beauty of<br><span class="gold">Ethiopia</span></h1>
+            <p>Discover ancient civilisations, dramatic landscapes, and vibrant cultures<br>waiting to be explored in the land of origins.</p>
+            <div class="hero-actions">
+                <a href="destinations.html" class="btn hero-btn-primary">
+                    <i class="fas fa-compass"></i> Explore Destinations
+                </a>
+                <a href="destinations.html" class="btn hero-btn-secondary">
+                    <i class="fas fa-play-circle"></i> See All Places
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="stat-number">18</span>
+                    <span class="stat-label">Destinations</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="stat-number">3</span>
+                    <span class="stat-label">Categories</span>
+                </div>
+                <div class="hero-stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="stat-number">9</span>
+                    <span class="stat-label">UNESCO Sites</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll-hint">
+            <span>Scroll to explore</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+
+    <div class="about">
+        <h2>About <span class="gold">Discover Ethiopia</span></h2>
+        <p>Discover Ethiopia helps travelers find organized and reliable information about Ethiopian tourist destinations.</p>
+    </div>
+
+    <div class="popular">
+        <h2>Popular <span class="gold">Destinations</span></h2>
+        <div class="destination-list" id="featuredDestinations"></div>
+    </div>
+
+    <footer>
+        <p>© 2026 Discover Ethiopia. All rights reserved.</p>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        const heroImages = [
+            { src: 'assets/Lalibela.jpg.jpg',        caption: 'Lalibela' },
+            { src: 'assets/simen mountains.jpg.jpg', caption: 'Simien Mountains' },
+            { src: 'assets/depression.jpg',          caption: 'Danakil Depression' },
+            { src: 'assets/gondar.jpg',              caption: 'Gondar Castles' },
+            { src: 'assets/omo.jpg',                 caption: 'Omo Valley' },
+            { src: 'assets/Axum.jpg',                caption: 'Axum' },
+            { src: 'assets/blue nile.jpg.jpg',       caption: 'Blue Nile Falls' },
+            { src: 'assets/timket.jpg',              caption: 'Timket Festival' },
+            { src: 'assets/tana.jpg',                caption: 'Lake Tana' },
+            { src: 'assets/harar.jpg',               caption: 'Harar Jugol' },
+            { src: 'assets/Erta Ale.jpg',            caption: 'Erta Ale' },
+            { src: 'assets/bale.jpg',                caption: 'Bale Mountains' },
+            { src: 'assets/meskel.jpg',              caption: 'Meskel Festival' },
+            { src: 'assets/coffee.jpg',              caption: 'Coffee Ceremony' },
+            { src: 'assets/merkato.jpg',             caption: 'Addis Merkato' },
+        ];
+
+        const slidesEl = document.getElementById('heroSlides');
+        const dotsEl   = document.getElementById('heroDots');
+        const prevBtn  = document.getElementById('heroPrev');
+        const nextBtn  = document.getElementById('heroNext');
+        let current = 0, timer;
+
+        heroImages.forEach((img, i) => {
+            const div = document.createElement('div');
+            div.className = 'hero-slide' + (i === 0 ? ' active' : '');
+            div.style.backgroundImage = `url('${img.src}')`;
+            slidesEl.appendChild(div);
+
+            const dot = document.createElement('button');
+            dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', img.caption);
+            dot.addEventListener('click', () => goTo(i));
+            dotsEl.appendChild(dot);
+        });
+
+        function goTo(index) {
+            slidesEl.querySelectorAll('.hero-slide')[current].classList.remove('active');
+            dotsEl.querySelectorAll('.hero-dot')[current].classList.remove('active');
+            current = (index + heroImages.length) % heroImages.length;
+            slidesEl.querySelectorAll('.hero-slide')[current].classList.add('active');
+            dotsEl.querySelectorAll('.hero-dot')[current].classList.add('active');
+            resetTimer();
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timer = setInterval(() => goTo(current + 1), 5000);
+        }
+
+        prevBtn.addEventListener('click', () => goTo(current - 1));
+        nextBtn.addEventListener('click', () => goTo(current + 1));
+        document.querySelector('.hero').addEventListener('mouseenter', () => clearInterval(timer));
+        document.querySelector('.hero').addEventListener('mouseleave', resetTimer);
+        resetTimer();
+    </script>
+</body>
+</html>

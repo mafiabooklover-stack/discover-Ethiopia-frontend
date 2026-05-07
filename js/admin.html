@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Discover Ethiopia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">Discover <span>Ethiopia</span></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="destinations.html">Destinations</a>
+            <a href="contact.html">Contact</a>
+            <div id="authNav"></div>
+        </div>
+    </nav>
+
+    <!-- Access denied (shown when not logged in) -->
+    <div id="accessDenied" style="display:none;" class="detail-error">
+        <i class="fas fa-lock"></i>
+        <h2>Login Required</h2>
+        <p>You must be logged in to access the admin panel.</p>
+        <a href="login.html?redirect=admin.html" class="btn">Login</a>
+    </div>
+
+    <!-- Admin panel (shown when logged in) -->
+    <div id="adminPanel" style="display:none;">
+
+        <div class="admin-header">
+            <div class="admin-header-text">
+                <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+                <p>Add and manage Ethiopian destinations</p>
+            </div>
+            <a href="destinations.html" class="btn btn-outline">
+                <i class="fas fa-eye"></i> View All Destinations
+            </a>
+        </div>
+
+        <div class="admin-container">
+
+            <!-- ── ADD PLACE FORM ── -->
+            <div class="admin-form-card">
+                <h2><i class="fas fa-plus-circle"></i> Add New Destination</h2>
+
+                <div id="formSuccess" class="auth-success" style="display:none;"></div>
+                <div id="formError"   class="auth-error"   style="display:none;"></div>
+
+                <form id="addPlaceForm" class="add-place-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Place Name *</label>
+                            <input type="text" id="pName" placeholder="e.g. Lalibela" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Region *</label>
+                            <input type="text" id="pRegion" placeholder="e.g. Amhara Region" required />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select id="pCategory" required>
+                                <option value="">-- Select category --</option>
+                                <option value="historical">Historical Site</option>
+                                <option value="natural">Natural Wonder</option>
+                                <option value="cultural">Cultural Experience</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Best Time to Visit *</label>
+                            <input type="text" id="pBestTime" placeholder="e.g. October to March" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Short Description *</label>
+                        <textarea id="pDescription" rows="3" placeholder="Brief overview of the place (shown on cards)..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Importance / Why Visit *</label>
+                        <input type="text" id="pImportance" placeholder="e.g. UNESCO World Heritage Site" required />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Latitude *</label>
+                            <input type="number" id="pLat" step="any" placeholder="e.g. 12.0319" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Longitude *</label>
+                            <input type="number" id="pLng" step="any" placeholder="e.g. 39.0474" required />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Entry Fee</label>
+                            <input type="text" id="pEntryFee" placeholder="e.g. $15 USD" />
+                        </div>
+                        <div class="form-group">
+                            <label>Suggested Duration</label>
+                            <input type="text" id="pDuration" placeholder="e.g. 1-2 days" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Highlights <span class="label-hint">(comma-separated)</span></label>
+                        <input type="text" id="pHighlights" placeholder="e.g. Rock churches, Ancient ruins, UNESCO site" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image Path <span class="label-hint">(relative, e.g. assets/myimage.jpg)</span></label>
+                        <input type="text" id="pImage" placeholder="assets/Lalibela.jpg.jpg" />
+                    </div>
+
+                    <button type="submit" class="btn admin-submit-btn" id="submitBtn">
+                        <span id="btnText"><i class="fas fa-plus"></i> Add Destination</span>
+                        <span id="btnSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- ── LIVE DESTINATIONS LIST ── -->
+            <div class="admin-list-card">
+                <div class="admin-list-header">
+                    <h2><i class="fas fa-list"></i> All Destinations</h2>
+                    <span class="admin-count" id="destCount">Loading...</span>
+                </div>
+                <div class="admin-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="adminSearch" placeholder="Search destinations..." oninput="filterList(this.value)" />
+                </div>
+                <div id="adminDestList" class="admin-dest-list">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Discover Ethiopia. All rights reserved.</p>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        const API = 'http://localhost:5001/api';
+        let allDestinations = [];
+
+        // Check auth on load
+        const user = getUser();
+        if (!user) {
+            document.getElementById('accessDenied').style.display = 'flex';
+        } else {
+            document.getElementById('adminPanel').style.display = 'block';
+            renderAuthNav(document.getElementById('authNav'));
+            loadDestinations();
+        }
+
+        // ── Load & render destination list ──
+        async function loadDestinations() {
+            try {
+                const res = await fetch(`${API}/destinations`);
+                allDestinations = await res.json();
+                renderList(allDestinations);
+                document.getElementById('destCount').textContent = `${allDestinations.length} places`;
+            } catch (err) {
+                document.getElementById('adminDestList').innerHTML =
+                    '<p class="admin-error">Could not load destinations. Is the server running?</p>';
+            }
+        }
+
+        function renderList(destinations) {
+            const container = document.getElementById('adminDestList');
+            if (!destinations.length) {
+                container.innerHTML = '<p class="admin-empty">No destinations found.</p>';
+                return;
+            }
+            container.innerHTML = destinations.map(d => `
+                <div class="admin-dest-item" id="item-${d._id}">
+                    <img src="${d.image}" alt="${d.name}" onerror="this.src='assets/Lalibela.jpg.jpg'">
+                    <div class="admin-dest-info">
+                        <strong>${d.name}</strong>
+                        <span class="admin-cat-badge admin-cat-${d.category}">${d.category}</span>
+                        <small><i class="fas fa-map-marker-alt"></i> ${d.region}</small>
+                    </div>
+                    <div class="admin-dest-actions">
+                        <a href="place.html?id=${d._id}" target="_blank" class="admin-btn-view" title="View detail">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <button class="admin-btn-delete" onclick="deleteDestination('${d._id}', '${d.name.replace(/'/g,"\\'")}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterList(query) {
+            const q = query.toLowerCase();
+            const filtered = allDestinations.filter(d =>
+                d.name.toLowerCase().includes(q) ||
+                d.region.toLowerCase().includes(q) ||
+                d.category.toLowerCase().includes(q)
+            );
+            renderList(filtered);
+        }
+
+        // ── Add destination form submit ──
+        document.getElementById('addPlaceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideMessages();
+            setLoading(true);
+
+            const highlights = document.getElementById('pHighlights').value
+                .split(',').map(h => h.trim()).filter(Boolean);
+
+            const payload = {
+                name:        document.getElementById('pName').value.trim(),
+                region:      document.getElementById('pRegion').value.trim(),
+                category:    document.getElementById('pCategory').value,
+                description: document.getElementById('pDescription').value.trim(),
+                importance:  document.getElementById('pImportance').value.trim(),
+                bestTime:    document.getElementById('pBestTime').value.trim(),
+                lat:         document.getElementById('pLat').value,
+                lng:         document.getElementById('pLng').value,
+                entryFee:    document.getElementById('pEntryFee').value.trim(),
+                duration:    document.getElementById('pDuration').value.trim(),
+                image:       document.getElementById('pImage').value.trim() || 'assets/Lalibela.jpg.jpg',
+                highlights
+            };
+
+            try {
+                const res = await fetch(`${API}/destinations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${getToken()}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Failed to add destination');
+
+                // Add to list WITHOUT page refresh
+                allDestinations.unshift(data);
+                renderList(allDestinations);
+                document.getElementById('destCount').textContent = `${allDestinations.length} places`;
+
+                showSuccess(`✓ "${data.name}" added successfully!`);
+                document.getElementById('addPlaceForm').reset();
+                document.getElementById('adminDestList').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        // ── Delete destination ──
+        async function deleteDestination(id, name) {
+            if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+            try {
+                const res = await fetch(`${API}/destinations/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${getToken()}` }
+                });
+                if (!res.ok) throw new Error('Delete failed');
+
+                // Remove from list without page refresh
+                allDestinations = allDestinations.filter(d => d._id !== id);
+                renderList(allDestinations);
+                document.getElementById('destCount').textContent = `${allDestinations.length} places`;
+
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        }
+
+        function setLoading(on) {
+            document.getElementById('submitBtn').disabled = on;
+            document.getElementById('btnText').style.display = on ? 'none' : 'inline';
+            document.getElementById('btnSpinner').style.display = on ? 'inline' : 'none';
+        }
+        function showSuccess(msg) {
+            const el = document.getElementById('formSuccess');
+            el.textContent = msg; el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 4000);
+        }
+        function showError(msg) {
+            const el = document.getElementById('formError');
+            el.textContent = msg; el.style.display = 'block';
+        }
+        function hideMessages() {
+            document.getElementById('formSuccess').style.display = 'none';
+            document.getElementById('formError').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

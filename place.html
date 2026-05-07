@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Details - Discover Ethiopia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS for map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+<body>
+    <nav>
+        <div class="logo">Discover <span>Ethiopia</span></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="destinations.html">Destinations</a>
+            <a href="contact.html">Contact</a>
+            <div id="authNav"></div>
+        </div>
+    </nav>
+
+    <!-- Loading State -->
+    <div id="placeLoading" class="detail-loading">
+        <div class="spinner"></div>
+        <p>Loading destination...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="placeError" class="detail-error" style="display:none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h2>Destination not found</h2>
+        <a href="destinations.html" class="btn">Back to Destinations</a>
+    </div>
+
+    <!-- Place Detail Content -->
+    <div id="placeContent" style="display:none;">
+        <!-- Hero image banner -->
+        <div class="detail-hero" id="detailHero">
+            <div class="detail-hero-overlay">
+                <div class="detail-hero-text">
+                    <div class="detail-category-badge" id="detailCategory"></div>
+                    <h1 id="detailName"></h1>
+                    <div class="detail-region">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="detailRegion"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-container">
+            <!-- Left column: info -->
+            <div class="detail-main">
+                <!-- Quick facts bar -->
+                <div class="quick-facts">
+                    <div class="fact-item">
+                        <i class="fas fa-star"></i>
+                        <div>
+                            <span class="fact-label">Importance</span>
+                            <span class="fact-value" id="detailImportance"></span>
+                        </div>
+                    </div>
+                    <div class="fact-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div>
+                            <span class="fact-label">Best Time to Visit</span>
+                            <span class="fact-value" id="detailBestTime"></span>
+                        </div>
+                    </div>
+                    <div class="fact-item">
+                        <i class="fas fa-ticket-alt"></i>
+                        <div>
+                            <span class="fact-label">Entry Fee</span>
+                            <span class="fact-value" id="detailEntryFee"></span>
+                        </div>
+                    </div>
+                    <div class="fact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <span class="fact-label">Suggested Duration</span>
+                            <span class="fact-value" id="detailDuration"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <section class="detail-section">
+                    <h2><i class="fas fa-info-circle"></i> About This Place</h2>
+                    <p id="detailDescription" class="detail-short-desc"></p>
+                    <div id="detailLongDescription" class="detail-long-desc"></div>
+                </section>
+
+                <!-- Highlights -->
+                <section class="detail-section" id="highlightsSection">
+                    <h2><i class="fas fa-thumbs-up"></i> Highlights</h2>
+                    <ul class="highlights-list" id="detailHighlights"></ul>
+                </section>
+
+                <!-- Back button -->
+                <div class="detail-actions">
+                    <a href="destinations.html" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> All Destinations
+                    </a>
+                    <a href="index.html" class="btn">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right column: map -->
+            <div class="detail-sidebar">
+                <div class="map-card">
+                    <h3><i class="fas fa-map"></i> Location</h3>
+                    <div id="map"></div>
+                    <div class="map-coords" id="mapCoords"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Discover Ethiopia. All rights reserved.</p>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        const API = 'http://localhost:5001/api';
+
+        // Render auth nav
+        renderAuthNav(document.getElementById('authNav'));
+
+        async function loadPlace() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+            if (!id) {
+                showError();
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API}/destinations/${id}`);
+                if (!res.ok) throw new Error('Not found');
+                const dest = await res.json();
+                renderPlace(dest);
+            } catch (err) {
+                showError();
+            }
+        }
+
+        function renderPlace(dest) {
+            document.title = `${dest.name} - Discover Ethiopia`;
+
+            // Hero
+            const hero = document.getElementById('detailHero');
+            hero.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url('${dest.image}')`;
+            document.getElementById('detailName').textContent = dest.name;
+            document.getElementById('detailRegion').textContent = dest.region;
+
+            const catLabels = { historical: 'Historical Site', natural: 'Natural Wonder', cultural: 'Cultural Experience' };
+            const catIcons  = { historical: 'fa-landmark', natural: 'fa-mountain', cultural: 'fa-users' };
+            document.getElementById('detailCategory').innerHTML =
+                `<i class="fas ${catIcons[dest.category] || 'fa-map'}"></i> ${catLabels[dest.category] || dest.category}`;
+
+            // Quick facts
+            document.getElementById('detailImportance').textContent = dest.importance;
+            document.getElementById('detailBestTime').textContent = dest.bestTime;
+            document.getElementById('detailEntryFee').textContent = dest.entryFee || 'Varies';
+            document.getElementById('detailDuration').textContent = dest.duration || '1-2 days';
+
+            // Description
+            document.getElementById('detailDescription').textContent = dest.description;
+            if (dest.longDescription) {
+                document.getElementById('detailLongDescription').textContent = dest.longDescription;
+            }
+
+            // Highlights
+            if (dest.highlights && dest.highlights.length) {
+                const ul = document.getElementById('detailHighlights');
+                dest.highlights.forEach(h => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-check-circle"></i> ${h}`;
+                    ul.appendChild(li);
+                });
+            } else {
+                document.getElementById('highlightsSection').style.display = 'none';
+            }
+
+            // Show content
+            document.getElementById('placeLoading').style.display = 'none';
+            document.getElementById('placeContent').style.display = 'block';
+
+            // Init map after content is visible
+            initMap(dest.lat, dest.lng, dest.name, dest.region);
+            document.getElementById('mapCoords').textContent =
+                `${dest.lat.toFixed(4)}° N, ${dest.lng.toFixed(4)}° E`;
+        }
+
+        function initMap(lat, lng, name, region) {
+            const map = L.map('map').setView([lat, lng], 8);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            const marker = L.marker([lat, lng]).addTo(map);
+            marker.bindPopup(`<b>${name}</b><br>${region}`).openPopup();
+        }
+
+        function showError() {
+            document.getElementById('placeLoading').style.display = 'none';
+            document.getElementById('placeError').style.display = 'flex';
+        }
+
+        loadPlace();
+    </script>
+</body>
+</html>
