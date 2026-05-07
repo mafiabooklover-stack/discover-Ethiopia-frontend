@@ -1,4 +1,4 @@
-const API = 'http://localhost:5001/api';
+const API = 'https://discover-ethiopia-backend.onrender.com';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Render auth nav on every page

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Discover Ethiopia
 
 **Name:** Melat Akalewerk
@@ -87,3 +88,6 @@ Discover Ethiopia/
 - Admin panel (login required): add new destinations, delete existing ones — list updates instantly without page refresh
 - Data persists in MongoDB (survives server restarts)
 - Responsive design for mobile and desktop
+=======
+# discover-Ethiopia-frontend
+>>>>>>> cac6a8d1155432cb62c1b636292f8cc7db20b528
