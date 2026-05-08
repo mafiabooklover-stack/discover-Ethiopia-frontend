@@ -162,24 +162,44 @@
             loadDestinations();
         }
 
-         // Check if current user is the owner
-const user = getUser();
-const OWNER_EMAIL = 'admin@discoverethiopia.com'; 
+         
+    
+// ==========================================
+//  ADMIN PANEL LOGIC
+// ==========================================
 
-// Get the "Add New Destination" form section
-const addFormSection = document.querySelector('.admin-form-card');
-
-// If user is NOT the owner, hide the form
-if (addFormSection) {
-    if (user && user.email === OWNER_EMAIL) {
-        // You are the owner - show the form
-        addFormSection.style.display = 'block';
+(async function initAdminPanel() {
+    const user = await getUser(); // Support async
+    const OWNER_EMAIL = 'demo-admin@discoverethiopia.com';
+    
+    const adminPanel = document.getElementById('adminPanel');
+    if (!adminPanel) return;
+    
+    if (user) {
+        adminPanel.style.display = 'block';
+        
+        // Owner-only features
+        const addFormSection = document.querySelector('.admin-form-card');
+        if (addFormSection) {
+            addFormSection.style.display = 
+                user.email === OWNER_EMAIL ? 'block' : 'none';
+        }
+        
+        await loadDestinations(); // Wait for data to load
     } else {
-        // Not the owner - hide the form
-        addFormSection.style.display = 'none';
+        // Preserve return URL
+        const returnUrl = encodeURIComponent('admin.html');
+        window.location.href = `login.html?redirect=${returnUrl}`;
+        return;
     }
-}
-        // ── Load & render destination list ──
+    
+    // Update navigation
+    const navElement = document.getElementById('authNav');
+    if (navElement && typeof renderAuthNav === 'function') {
+        renderAuthNav(navElement);
+    }
+})();
+        
         async function loadDestinations() {
             try {
                 const res = await fetch(`${API}/api/destinations`);
