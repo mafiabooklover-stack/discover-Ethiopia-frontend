@@ -162,6 +162,23 @@
             loadDestinations();
         }
 
+         // Check if current user is the owner
+const user = getUser();
+const OWNER_EMAIL = 'demo-admin@discoverethiopia.com'; 
+
+// Get the "Add New Destination" form section
+const addFormSection = document.querySelector('.admin-form-card');
+
+// If user is NOT the owner, hide the form
+if (addFormSection) {
+    if (user && user.email === OWNER_EMAIL) {
+        // You are the owner - show the form
+        addFormSection.style.display = 'block';
+    } else {
+        // Not the owner - hide the form
+        addFormSection.style.display = 'none';
+    }
+}
         // ── Load & render destination list ──
         async function loadDestinations() {
             try {
@@ -200,7 +217,6 @@
                 </div>
             `).join('');
         }
-
         function filterList(query) {
             const q = query.toLowerCase();
             const filtered = allDestinations.filter(d =>
