@@ -1,17 +1,36 @@
-<<<<<<< HEAD
 # Discover Ethiopia
 
-**Name:** Melat Akalewerk
+Team Members:
+# Discover Ethiopia - Travel Guide
 
-**What this website does:** A full-stack travel guide website where users can browse, search, and view detailed information about Ethiopian tourist destinations — including historical sites, natural wonders, and cultural experiences — with an interactive map for each place, user authentication, and an admin panel to add new destinations.
+## Team Members:
+- Yousri Yousra Abdela
+- Dibora Tesfaye
+- Melat Akalework
+- Bement Abayneh
+- Anisa Jemal
+- Eman Ansar
+- Leyla Tofik
+- Sumeya Murad
+- Abaynesh Haylu
+- Afomiya Fikadu
+- Aster Bekele
+- Rebia Mohammed
 
-**Backend language:** Node.js (Express.js) with MongoDB
+## What This Website Does:
+A full-stack travel guide website where users can browse, search, and view detailed information about Ethiopian tourist destinations — including historical sites, natural wonders, and cultural experiences — with an interactive map for each place, user authentication, and an admin panel to add new destinations.
 
-**How to run it:**
+## Backend Language:
+Node.js (Express.js) with MongoDB
 
+## Live Website:
+https://discover-ethiopia-frontend.onrender.com
+
+## How to Run It:
+
+### 1. Start MongoDB (if not already running)
 ```bash
-# 1. Start MongoDB (if not already running)
-brew services start mongodb-community
+# Ensure MongoDB service is running or use MongoDB Atlas connection string
 
 # 2. Install backend dependencies
 cd backend
@@ -88,6 +107,20 @@ Discover Ethiopia/
 - Admin panel (login required): add new destinations, delete existing ones — list updates instantly without page refresh
 - Data persists in MongoDB (survives server restarts)
 - Responsive design for mobile and desktop
-=======
-# discover-Ethiopia-frontend
->>>>>>> cac6a8d1155432cb62c1b636292f8cc7db20b528
+Tech Stack:
+Frontend: HTML5, CSS3, JavaScript (Vanilla)
+
+Backend: Node.js, Express.js
+
+Database: MongoDB Atlas
+
+Authentication: JWT (JSON Web Tokens)
+
+Deployment: Render
+
+Demo Account:
+Email: demo-admin@discoverethiopia.com
+
+Password: 123456
+
+© 2026 Discover Ethiopia Project. All rights reserved
