@@ -121,6 +121,6 @@ Deployment: Render
 Demo Account:
 Email: demo-admin@discoverethiopia.com
 
-Password: 123456
+Password: 12345678
 
 © 2026 Discover Ethiopia Project. All rights reserved
